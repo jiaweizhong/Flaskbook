@@ -19,15 +19,13 @@ class BaseUserForm(FlaskForm):
         validators.DataRequired(),
         validators.length(min=4, max=25)
     ])
-
-    bio = StringField(
-        'Bio',
-        widget=TextArea(),
-        validators=[validators.Length(max=160)]
-    )
+    bio = StringField('Bio',
+                      widget=TextArea(),
+                      validators=[validators.Length(max=160)]
+                      )
 
 
-class RegisterForm(BaseUserForm):
+class PasswordBaseForm(FlaskForm):
     password = PasswordField('New Password', [
         validators.DataRequired(),
         validators.EqualTo('confirm', message='Passwords must match'),
@@ -35,6 +33,8 @@ class RegisterForm(BaseUserForm):
     ])
     confirm = PasswordField('Repeat Password')
 
+
+class RegisterForm(BaseUserForm, PasswordBaseForm):
     def validate_username(form, field):
         if User.objects.filter(username=field.data).first():
             raise ValidationError("Username already exists")
@@ -59,3 +59,16 @@ class LoginForm(FlaskForm):
 
 class EditForm(BaseUserForm):
     pass
+
+
+class ForgotForm(FlaskForm):
+    email = EmailField('Email address', [validators.DataRequired(), validators.Email()])
+
+
+class PasswordResetForm(PasswordBaseForm):
+    current_password = PasswordField('Current Password',
+        [validators.DataRequired(),
+        validators.Length(min=4, max=80)]
+    )
+
+
