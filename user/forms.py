@@ -4,6 +4,7 @@ from wtforms.widgets import TextArea
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import ValidationError
 from user.models import User
+from flask_wtf.file import FileField, FileAllowed
 import re
 
 
@@ -30,7 +31,7 @@ class PasswordBaseForm(FlaskForm):
         validators.DataRequired(),
         validators.EqualTo('confirm', message='Passwords must match'),
         validators.length(min=4, max=80)
-    ])
+        ])
     confirm = PasswordField('Repeat Password')
 
 
@@ -58,7 +59,10 @@ class LoginForm(FlaskForm):
 
 
 class EditForm(BaseUserForm):
-    pass
+    image = FileField('Profile image', validators=[
+        FileAllowed(['jpg', 'jpeg', 'png', 'gif'],
+                    'Only JPEG, PNG and GIFs allowed')
+    ])
 
 
 class ForgotForm(FlaskForm):

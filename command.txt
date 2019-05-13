@@ -4,5 +4,8 @@ source myproject/bin/activate
 pip freeze > requirements.txt
 pip install -r requirements.txt
 
+-----------image upload-----------
+sudo apt-get install libmagickcore-dev
+
 ----------------------------------
 python manage.py runserver
