@@ -110,7 +110,6 @@ def edit():
             if user.email != form.email.data.lower():
                 if User.objects.filter(email=form.email.data.lower()).first():
                     error = "Email already exists"
-
                 else:
                     code = str(uuid.uuid4())
 
@@ -129,7 +128,6 @@ def edit():
 
             if not error:
                 form.populate_obj(user)
-                # store image
                 if image_ts:
                     user.profile_image = image_ts
                 user.save()
