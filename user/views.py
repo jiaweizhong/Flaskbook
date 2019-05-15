@@ -7,6 +7,8 @@ from utilities.imaging import thumbnail_process
 import bcrypt
 import os
 from werkzeug.utils import secure_filename
+from relationship.models import Relationship
+from user.decorators import login_required
 import uuid
 
 user_app = Blueprint('user_app', __name__)
@@ -77,16 +79,21 @@ def logout():
 @user_app.route('/<username>', methods=('GET', 'POST'))
 def profile(username):
     edit_profile = False
+    rel = None
     user = User.objects.filter(username=username).first()
     if user and session.get('username') and user.username == session.get('username'):
         edit_profile = True
     if user:
-        return render_template('user/profile.html', user=user, edit_profile=edit_profile)
+        if session.get('username'):
+            logged_user = User.objects.filter(username=session.get('username')).first()
+            rel = Relationship.get_relationship(logged_user, user)
+        return render_template('user/profile.html', user=user, rel=rel, edit_profile=edit_profile)
     else:
         abort(404)
 
 
 @user_app.route('/edit', methods=('GET', 'POST'))
+@login_required
 def edit():
     error = None
     message = None
@@ -182,7 +189,6 @@ def forgot():
 def password_reset(username, code):
     message = None
     require_current = None
-
     form = PasswordResetForm()
 
     user = User.objects.filter(username=username).first()
