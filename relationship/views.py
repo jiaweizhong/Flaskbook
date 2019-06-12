@@ -1,6 +1,5 @@
 from flask import Blueprint, abort, session, redirect, url_for
 
-
 from user.models import User
 from relationship.models import Relationship
 from user.decorators import login_required
@@ -8,7 +7,7 @@ from user.decorators import login_required
 relationship_app = Blueprint('relationship_app', __name__)
 
 
-@relationship_app.route('/add_friend/<to_username>')  # always GET
+@relationship_app.route('/add_friend/<to_username>')
 @login_required
 def add_friend(to_username):
     logged_user = User.objects.filter(username=session.get('username')).first()
@@ -17,7 +16,7 @@ def add_friend(to_username):
     if to_user:
         rel = Relationship.get_relationship(logged_user, to_user)
         to_username = to_user.username
-        if rel == 'REVERSE_FRIENDS_PENDING':
+        if rel == "REVERSE_FRIENDS_PENDING":
             Relationship(
                 from_user=logged_user,
                 to_user=to_user,
@@ -29,7 +28,7 @@ def add_friend(to_username):
                 to_user=logged_user)
             reverse_rel.status = Relationship.APPROVED
             reverse_rel.save()
-        elif rel is None and rel != "REVERSE_BLOCKED":
+        elif rel == None and rel != "REVERSE_BLOCKED":
             Relationship(
                 from_user=logged_user,
                 to_user=to_user,
@@ -50,7 +49,7 @@ def remove_friend(to_username):
     if to_user:
         rel = Relationship.get_relationship(logged_user, to_user)
         to_username = to_user.username
-        if rel == "FRIENDS_PENDING" or rel == "FRIENDS_APPROVED" or rel=="REVERSE_FRIENDS_PENDING":
+        if rel == "FRIENDS_PENDING" or rel == "FRIENDS_APPROVED" or rel == "REVERSE_FRIENDS_PENDING":
             rel = Relationship.objects.filter(
                 from_user=logged_user,
                 to_user=to_user).delete()
@@ -84,7 +83,7 @@ def block(to_username):
             to_user=to_user,
             rel_type=Relationship.BLOCKED,
             status=Relationship.APPROVED
-            ).save()
+        ).save()
         return redirect(url_for('user_app.profile', username=to_username))
     else:
         abort(404)
